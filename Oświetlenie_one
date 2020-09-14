@@ -2,9 +2,9 @@
 #include <WiFiUdp.h>
 #include <BlynkSimpleEsp8266.h>
 
-char auth[] = "c2ac05057e1f41b48d5a90d1d4996ab5";
-char ssid[] = "AndroidAP";
-char pass[] = "qizb4415";
+char auth[] = "your auth";
+char ssid[] = "your ID";
+char pass[] = "your pass";
 
 int S0=LOW;
 int S1=LOW;
