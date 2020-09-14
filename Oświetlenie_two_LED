@@ -1,0 +1,150 @@
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+#include <BlynkSimpleEsp8266.h>
+char auth[] = "your auth";
+char ssid[] = "your ssid";
+char pass[] = "your pass";
+
+
+int m=0;
+int o=0;
+int ji=LOW;
+int j=255;
+
+BlynkTimer timer;
+
+
+BLYNK_CONNECTED()
+{
+  Blynk.syncVirtual(V3);
+}
+BLYNK_WRITE(V3)
+{
+ if(o==1||m>0)
+ { 
+  j =  param.asInt();
+  
+  analogWrite(4,j); 
+ }
+}
+BLYNK_WRITE(V1)
+{
+ int oi=param.asInt();
+ if(oi==HIGH)
+ {
+  o++;
+  m=0;
+  if(o>1)
+  {
+    o=0; 
+    digitalWrite(4,LOW);
+    Blynk.setProperty(V1, "offLabel", "OFF");
+    Blynk.setProperty(V1, "color", "#23C48E");
+    Blynk.setProperty(V1, "onLabel", "ON");
+    Blynk.setProperty(V2, "color", "#23C48E");
+  }
+ if(o==1)
+ {
+  
+  analogWrite(4,j); 
+  Blynk.setProperty(V1, "offLabel", "ON");
+  Blynk.setProperty(V1, "color", "#D3435C");
+  Blynk.setProperty(V1, "onLabel", "OFF");
+  Blynk.setProperty(V2, "color", "#23C48E");
+ }
+ }
+}
+BLYNK_WRITE(V2)
+{
+  int mi=param.asInt();
+  if(mi==HIGH)
+  {
+    m++;
+    o=0;
+    Blynk.setProperty(V2, "color", "#D3435C");
+    if(m>3)
+    {
+      m=0;
+      o=1;
+      analogWrite(4,j);
+      Blynk.setProperty(V2, "color", "#23C48E");
+      
+    }
+  }
+}
+
+void LED_M()
+{
+  switch(m)
+  {
+    case 1:
+     analogWrite(4,j);
+     delay(200);
+     digitalWrite(4,LOW);
+     delay(200);
+    break;
+    case 2:
+     analogWrite(4,j);
+     delay(300);
+     digitalWrite(4,LOW);
+     delay(300);
+    
+    break;
+    case 3:
+      for (int fadeValue = 0 ; fadeValue <= 255; fadeValue += 5) 
+      {
+       analogWrite(4, fadeValue);
+       delay(30);
+      }
+      for (int fadeValue = 255 ; fadeValue >= 0; fadeValue -= 5) 
+      {
+       analogWrite(4, fadeValue);
+       delay(30);
+      }
+    break;
+  }
+}
+
+void W1()
+{
+   ji=digitalRead(5);
+  
+  if(ji==LOW)
+  {
+    
+    
+   m=0;
+   o=0;
+    digitalWrite(4,LOW);
+    Blynk.setProperty(V1, "offLabel", "OFF");
+    Blynk.setProperty(V1, "color", "#23C48E");
+    Blynk.setProperty(V1, "onLabel", "ON");
+    Blynk.setProperty(V2, "color", "#23C48E");
+  }
+    
+}
+
+
+
+
+void setup()
+{
+
+  Serial.begin(115200);
+  Blynk.begin(auth, ssid, pass);
+  pinMode(4,OUTPUT);
+  pinMode(5,INPUT_PULLUP);
+  pinMode(14,INPUT);
+  digitalWrite(4,LOW);
+  
+  
+}
+
+void loop()
+{
+  Blynk.run();
+  LED_M();
+  W1();
+
+ 
+}
